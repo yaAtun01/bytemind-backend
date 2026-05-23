@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ByteMind ⚡
 
-## Getting Started
+> **Pahami Kode Lebih Cerdas** — Platform berbasis AI yang membantu pemula memahami kode pemrograman dengan penjelasan langkah demi langkah yang jelas dan mudah dipahami.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![Express.js](https://img.shields.io/badge/Express.js-4-green?logo=express)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-blue?logo=tailwindcss)
 
+---
+
+## 🚀 Cara Memulai (Getting Started)
+
+### Prasyarat
+- **Node.js** (versi 18+) dan **npm** sudah terinstal di komputer Anda.
+- (Opsional) API Key Gemini dari [Google AI Studio](https://aistudio.google.com/apikey). Jika dikosongkan, aplikasi akan berjalan menggunakan **Mode Simulasi**.
+
+### Instalasi dan Menjalankan Aplikasi
+Aplikasi ini sudah dikonfigurasi untuk menjalankan Frontend dan Backend secara bersamaan hanya dengan satu perintah.
+
+**1. Instalasi Dependensi**
+Buka terminal di direktori utama (`bytemind/`), lalu jalankan perintah berikut untuk menginstal dependensi:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Instal dependensi frontend (dan concurrently)
+npm install
+
+# Instal dependensi backend
+npm --prefix server install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Konfigurasi Environment Variables**
+Siapkan konfigurasi environment untuk aplikasi:
+- Buat file `.env.local` di folder **root**:
+  ```env
+  NEXT_PUBLIC_API_URL=http://localhost:5000
+  ```
+- Buat file `.env` di dalam folder **`server/`**:
+  ```env
+  PORT=5000
+  GEMINI_API_KEY=KUNCI_API_ANDA_DISINI # Kosongkan untuk Mode Simulasi
+  ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**3. Jalankan Aplikasi**
+Cukup jalankan satu perintah ini di direktori utama:
+```bash
+npm run dev
+```
+*Selesai! Frontend kini berjalan di http://localhost:3000 dan Backend API berjalan di http://localhost:5000.*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Teknologi Utama
+- **Frontend**: Next.js 16 (App Router), Tailwind CSS v4, TypeScript
+- **Backend**: Express.js
+- **AI Engine**: Gemini API (Live Mode) & ByteMind Simulation Engine (Offline)
+- **Fitur Andalan**: Mode Gelap/Terang Otomatis, Dukungan Bilingual (Bahasa Indonesia & Inggris), Desain antarmuka Glassmorphism bergaya premium.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 Lisensi
+Lisensi MIT — Bebas dikembangkan dan digunakan untuk tujuan pembelajaran.

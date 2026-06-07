@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ByteMind ⚡
 
 > **Pahami Kode Lebih Cerdas** — Platform berbasis AI yang membantu pemula memahami kode pemrograman dengan penjelasan langkah demi langkah yang jelas, terperinci, dan mudah dipahami.
@@ -96,3 +97,6 @@ Perintah di atas akan mengunduh paket Vercel CLI secara temporer, meminta Anda m
 
 ## 📄 Lisensi
 Lisensi MIT — Bebas dikembangkan dan digunakan untuk tujuan pembelajaran.
+=======
+# backend-bytemind
+>>>>>>> d52e47e00e42d3809cb9d44dc5b663896fa54cfd

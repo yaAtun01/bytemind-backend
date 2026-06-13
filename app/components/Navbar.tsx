@@ -15,16 +15,19 @@ export default function Navbar({ uiLang, setUiLang }: NavbarProps) {
 
   useEffect(() => {
     const stored = localStorage.getItem("bytemind-theme");
+    let dark = false;
     if (stored === "dark") {
-      setIsDark(true);
+      dark = true;
       document.documentElement.classList.add("dark");
     } else if (stored === "light") {
-      setIsDark(false);
+      dark = false;
       document.documentElement.classList.remove("dark");
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setIsDark(true);
+      dark = true;
       document.documentElement.classList.add("dark");
     }
+    const timer = setTimeout(() => setIsDark(dark), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

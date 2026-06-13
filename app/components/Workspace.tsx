@@ -13,7 +13,7 @@ const LANGUAGES = [
   { value: "sql", label: "SQL" },
 ];
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface WorkspaceProps {
   uiLang: UiLang;
@@ -34,9 +34,11 @@ export default function Workspace({ uiLang }: WorkspaceProps) {
   const [copied, setCopied] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Keep target explanation language in sync with general UI language changes by default
   useEffect(() => {
-    setTargetLang(uiLang);
+    const timer = setTimeout(() => {
+      setTargetLang(uiLang);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [uiLang]);
 
   const selectedLang = LANGUAGES.find((l) => l.value === language)!;

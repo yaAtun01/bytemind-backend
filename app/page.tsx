@@ -18,7 +18,8 @@ export default function Home() {
   useEffect(() => {
     const stored = localStorage.getItem("bytemind-lang") as UiLang;
     if (stored === "en" || stored === "id") {
-      setUiLang(stored);
+      const timer = setTimeout(() => setUiLang(stored), 0);
+      return () => clearTimeout(timer);
     }
   }, []);
 

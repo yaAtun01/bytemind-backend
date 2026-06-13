@@ -1,64 +1,55 @@
 /**
- * ByteMind — Express.js API Server
- *
- * Dual-mode: uses Gemini 2.5 Flash when GEMINI_API_KEY is set,
- * otherwise falls back to a rich simulation engine.
+ * ByteMind Code Explainer Utility
+ * 
+ * Contains logic for:
+ * 1. Calling Google Gemini 2.5 Flash API (Live Mode)
+ * 2. Running a local regex-based explanation simulator (Simulation Mode)
  */
 
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
+export interface ExplanationResult {
+  summary: string;
+  steps: Array<{
+    title: string;
+    detail: string;
+  }>;
+}
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+/**
+ * Explains code using Gemini API (if API Key is present) or falls back to simulation mode.
+ */
+export async function explainCode(
+  code: string,
+  language: string,
+  targetLanguage: string = "id"
+): Promise<ExplanationResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: "1mb" }));
-
-/* ================================================================
-   Health-check
-   ================================================================ */
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", mode: process.env.GEMINI_API_KEY ? "live" : "simulation" });
-});
-
-/* ================================================================
-   POST /api/explain
-   Body: { code: string, language: string }
-   Returns: { summary: string, steps: { title, detail }[] }
-   ================================================================ */
-app.post("/api/explain", async (req, res) => {
-  try {
-    const { code, language, targetLanguage = "id" } = req.body;
-
-    if (!code || !language) {
-      return res.status(400).json({ error: "Both 'code' and 'language' are required." });
+  if (apiKey) {
+    try {
+      return await callGemini(code, language, targetLanguage, apiKey);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("[ByteMind Explainer] Gemini Live Mode failed, falling back to simulation:", errorMessage);
+      return simulateExplanation(code, language, targetLanguage);
     }
-
-    // --- Live mode: Gemini API ---
-    if (process.env.GEMINI_API_KEY) {
-      const result = await callGemini(code, language, targetLanguage);
-      return res.json(result);
-    }
-
-    // --- Simulation mode ---
-    const result = simulateExplanation(code, language, targetLanguage);
-    return res.json(result);
-  } catch (err) {
-    console.error("[ByteMind] Error:", err.message || err);
-    return res.status(500).json({ error: "Internal server error." });
   }
-});
 
-/* ================================================================
-   Gemini 2.5 Flash integration
-   ================================================================ */
-async function callGemini(code, language, targetLanguage = "id") {
-  const API_KEY = process.env.GEMINI_API_KEY;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+  // Fallback to offline simulation mode
+  return simulateExplanation(code, language, targetLanguage);
+}
 
+/**
+ * Call Gemini 2.5 Flash API
+ */
+async function callGemini(
+  code: string,
+  language: string,
+  targetLanguage: string,
+  apiKey: string
+): Promise<ExplanationResult> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   const isIndo = targetLanguage === "id";
+  
   const systemPrompt = isIndo
     ? `You are ByteMind, an AI code tutor for absolute beginners.
 Analyze the provided ${language} code and respond with a JSON object in INDONESIAN containing:
@@ -76,7 +67,14 @@ Respond ONLY with valid JSON. No markdown fences.`;
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [
-        { role: "user", parts: [{ text: `${systemPrompt}\n\nCode:\n\`\`\`${language}\n${code}\n\`\`\`` }] },
+        {
+          role: "user",
+          parts: [
+            {
+              text: `${systemPrompt}\n\nCode:\n\`\`\`${language}\n${code}\n\`\`\``,
+            },
+          ],
+        },
       ],
       generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
     }),
@@ -99,23 +97,37 @@ Respond ONLY with valid JSON. No markdown fences.`;
     // Fallback if Gemini returns non-JSON
     return {
       summary: text.slice(0, 300),
-      steps: [{ title: isIndo ? "Respon Lengkap" : "Full Response", detail: text }],
+      steps: [
+        {
+          title: isIndo ? "Respon Lengkap" : "Full Response",
+          detail: text,
+        },
+      ],
     };
   }
 }
 
-/* ================================================================
-   Simulation engine — rich, educational mock explanations
-   ================================================================ */
-function simulateExplanation(code, language, targetLanguage = "id") {
+/**
+ * Local simulation engine for offline or fallback mode
+ */
+function simulateExplanation(
+  code: string,
+  language: string,
+  targetLanguage: string
+): ExplanationResult {
   const isIndo = targetLanguage === "id";
   const lines = code.split("\n").filter((l) => l.trim());
-  const langLabel = {
-    python: "Python", javascript: "JavaScript", java: "Java",
-    cpp: "C++", html: "HTML/CSS", sql: "SQL",
-  }[language] || language;
+  const langLabel =
+    ({
+      python: "Python",
+      javascript: "JavaScript",
+      java: "Java",
+      cpp: "C++",
+      html: "HTML/CSS",
+      sql: "SQL",
+    } as Record<string, string>)[language] || language;
 
-  const steps = [];
+  const steps: { title: string; detail: string }[] = [];
 
   // Detect common patterns
   const hasFunction = /\b(def |function |void |int |public )\b/.test(code);
@@ -230,7 +242,7 @@ function simulateExplanation(code, language, targetLanguage = "id") {
   }
 
   // Build a contextual summary
-  const detectedFeatures = [];
+  const detectedFeatures: string[] = [];
   if (hasFunction) detectedFeatures.push(isIndo ? "definisi fungsi" : "function definitions");
   if (hasLoop) detectedFeatures.push(isIndo ? "perulangan (loop)" : "loops");
   if (hasCondition) detectedFeatures.push(isIndo ? "logika kondisional" : "conditional logic");
@@ -249,14 +261,3 @@ function simulateExplanation(code, language, targetLanguage = "id") {
 
   return { summary, steps };
 }
-
-/* ================================================================
-   Start server
-   ================================================================ */
-app.listen(PORT, () => {
-  const mode = process.env.GEMINI_API_KEY ? "🟢 Live (Gemini)" : "🟡 Simulation";
-  console.log(`\n  ⚡ ByteMind API Server`);
-  console.log(`  → Port:  ${PORT}`);
-  console.log(`  → Mode:  ${mode}`);
-  console.log(`  → Ready: http://localhost:${PORT}\n`);
-});

@@ -66,32 +66,44 @@ npm --prefix server install
 **2. Konfigurasi Environment Variables**
 * Buat berkas `.env.local` di folder **root** (frontend):
   ```env
-  NEXT_PUBLIC_API_URL=http://localhost:5000
+  GEMINI_API_KEY=KUNCI_API_GEMINI_ANDA
+  # NEXT_PUBLIC_API_URL= (Kosongkan jika menggunakan Serverless API Routes bawaan, atau isi jika ingin menembak Express backend eksternal)
   ```
-* Buat berkas `.env` di dalam folder **`server/`** (backend):
+* (Opsional jika ingin menjalankan backend terpisah) Buat berkas `.env` di dalam folder **`server/`** (backend):
   ```env
   PORT=5000
   GEMINI_API_KEY=KUNCI_API_GEMINI_ANDA
   ```
 
-**3. Jalankan Aplikasi Secara Bersamaan**
-Gunakan perintah `dev` di folder root untuk menjalankan frontend dan backend secara bersamaan menggunakan `concurrently`:
-```bash
-npm run dev
-```
-*Aplikasi Frontend akan berjalan di [http://localhost:3000](http://localhost:3000) dan API Backend berjalan di [http://localhost:5000](http://localhost:5000).*
+**3. Jalankan Aplikasi**
+* **Untuk mode Serverless (Rekomendasi Vercel/Lokal):**
+  Jalankan perintah berikut di folder root:
+  ```bash
+  npm run dev:frontend
+  ```
+  *Aplikasi akan berjalan di [http://localhost:3000](http://localhost:3000) dan secara otomatis melayani backend melalui route `/api/explain`.*
+
+* **Untuk mode Frontend + Express Backend Terpisah:**
+  Jalankan perintah ini di folder root:
+  ```bash
+  npm run dev
+  ```
+  *Aplikasi Frontend akan berjalan di [http://localhost:3000](http://localhost:3000) dan Express API Backend berjalan di [http://localhost:5000](http://localhost:5000).*
 
 ---
 
 ## ☁️ Cara Deploy ke Vercel
 
-Jika Anda ingin mempublikasikan aplikasi ini ke **Vercel** tetapi belum menginstal Vercel CLI secara global, Anda dapat menggunakan perintah **`npx`** tanpa perlu menginstalnya secara global.
+Aplikasi ini dapat langsung dideploy ke **Vercel** sebagai aplikasi full-stack terpadu menggunakan **Next.js API Routes** (Serverless). Anda tidak perlu mendeploy backend Express secara terpisah.
 
-Jalankan perintah berikut pada terminal direktori utama:
-```bash
-npx vercel --prod
-```
-Perintah di atas akan mengunduh paket Vercel CLI secara temporer, meminta Anda masuk (login/register) ke akun Vercel, lalu melakukan deployment langsung ke server produksi Vercel. Setelah selesai, perbarui link web utama di bagian atas berkas `README.md` ini dengan tautan produksi Vercel Anda.
+1. **Deploy ke Vercel** menggunakan Vercel CLI di folder root:
+   ```bash
+   npx vercel --prod
+   ```
+2. **Atur Environment Variables** di Dashboard Vercel proyek Anda:
+   - Tambahkan variabel **`GEMINI_API_KEY`** dengan API Key Gemini Anda.
+   - Kosongkan **`NEXT_PUBLIC_API_URL`** agar aplikasi otomatis menggunakan route serverless bawaan.
+3. Setelah selesai, perbarui link web utama di bagian atas berkas `README.md` ini dengan tautan produksi Vercel Anda.
 
 ---
 
